@@ -5,7 +5,7 @@ metadata:
   namespace: polaris-system
 data:
   polaris.yaml: |-
-    apiVersion: v1
+    {`apiVersion: v1
     kind: ConfigMap
     metadata:
       namespace: {{ .Namespace }}
@@ -15,4 +15,4 @@ data:
         global:
           serverConnector:
             addresses:
-              - {{ .PolarisServer }}
+              - {{ .PolarisServer }}`}
