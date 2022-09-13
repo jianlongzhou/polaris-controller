@@ -99,7 +99,8 @@ data:
         imagePullPolicy: Always
         command: ["/usr/local/bin/envoy"]
         args: ["-c", "/etc/envoy/envoy.yaml", "--log-path", "/etc/envoy_logs/envoy.log"]
-        resources: {{ include "controller.containerSecurityContext" . | nindent 10 }}
+        resources:
+        {{ include "configmap-sidecar.resources" . | nindent 10 }}
         env:
         - name: ENVOY_UID
           value: "1337"
@@ -135,10 +136,7 @@ data:
         image: polarismesh/polaris-envoy-bootstrap-generator:v1.3.0-beta.1
         imagePullPolicy: Always
         env:
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
+        {{ include "configmap-sidecar.envs" . | nindent 10 }}
         volumeMounts:
           - mountPath: /var/lib/data
             name: envoy-bootstrap
@@ -148,17 +146,7 @@ data:
         image: istio/proxyv2:1.11.4
         imagePullPolicy: IfNotPresent
         args:
-          - istio-iptables
-          - -p
-          - "15001"
-          - -u
-          - "1337"
-          - -m
-          - REDIRECT
-          - -i
-          - "10.4.4.4/32"
-          - -b
-          - --redirect-dns=true
+        {{ include "configmap-sidecar.args" . | nindent 12 }}
         resources:
           limits:
             cpu: 100m
