@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: polaris-sidecar-injector
+  name: {{ include "polaris-controller.controller.fullname" . }}-sidecar
   namespace: polaris-system
   labels:
     app: sidecar-injector
@@ -19,7 +19,7 @@ data:
 
     template: |
       containers:
-      - image: polarismesh/polaris-sidecar:v1.3.0-beta.0
+      - image: {{ include "polaris-controller.sidecar.image" . }}
         name: polaris-sidecar
         securityContext:
           allowPrivilegeEscalation: true
@@ -34,7 +34,7 @@ data:
           runAsGroup: 1337
           runAsNonRoot: false
           runAsUser: 1337
-        imagePullPolicy: Always
+        imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
         resources:
           limits:
             cpu: 200m
@@ -100,7 +100,7 @@ data:
         command: ["/usr/local/bin/envoy"]
         args: ["-c", "/etc/envoy/envoy.yaml", "--log-path", "/etc/envoy_logs/envoy.log"]
         resources:
-        {{ include "configmap-sidecar.resources" . | nindent 10 }}
+        {{ include "configmap-sidecar.envoy_resources" . | nindent 8 }}
         env:
         - name: ENVOY_UID
           value: "1337"
@@ -136,7 +136,7 @@ data:
         image: polarismesh/polaris-envoy-bootstrap-generator:v1.3.0-beta.1
         imagePullPolicy: Always
         env:
-        {{ include "configmap-sidecar.envs" . | nindent 10 }}
+        {{ include "configmap-sidecar.bootstrap_envs" . | nindent 10 }}
         volumeMounts:
           - mountPath: /var/lib/data
             name: envoy-bootstrap
@@ -146,7 +146,7 @@ data:
         image: istio/proxyv2:1.11.4
         imagePullPolicy: IfNotPresent
         args:
-        {{ include "configmap-sidecar.args" . | nindent 12 }}
+        {{ include "configmap-sidecar.bootstrap_args" . | nindent 10 }}
         resources:
           limits:
             cpu: 100m

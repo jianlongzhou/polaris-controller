@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: injector-mesh
+  name: {{ include "polaris-controller.controller.fullname" . }}-mesh
   namespace: polaris-system
 data:
   mesh: |-
@@ -40,16 +40,16 @@ data:
         errorOutputPaths:
           - stderr
     # k8s cluster name
-    clusterName: "default"
+    clusterName: "{{ default defaultCluster .Values.cluster.name }}"
     # polaris-sidecar 注入的默认启动模式, 可以配置 mesh 或者 dns
     sidecarInject:
       mode: "mesh"
     # service sync
     serviceSync:
       mode: "all"
-      serverAddress: 106.52.224.46:8090
+      serverAddress: {{ .Values.polaris.server.address }}
       # 北极星开启鉴权时需要配置
-      accessToken: nu/0WRA4EqSR1FagrjRj0fZwPXuGlMpX+zCuWu4uMqy8xr1vRjisSbA25aAC3mtU8MeeRsKhQiDAynUR09I=
+      accessToken: {{ .Values.polaris.server.token }}
     defaultConfig:
       proxyMetadata:
-        serverAddress: 106.52.224.46:8090
+        serverAddress: {{ .Values.polaris.server.address }}

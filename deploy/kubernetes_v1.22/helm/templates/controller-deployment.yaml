@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    qcloud-app: polaris-controller
-  name: polaris-controller
+    {{- include "polaris-controller.controller.labels" . | nindent 4 }}
+  name: {{ include "polaris-controller.controller.fullname" . }}
   namespace: polaris-system
 spec:
   progressDeadlineSeconds: 60
@@ -11,7 +11,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: polaris-controller
+      {{- include "polaris-controller.controller.selectorLabels" . | nindent 6 }}
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -20,12 +20,11 @@ spec:
   template:
     metadata:
       labels:
-        k8s-app: polaris-controller
-        app: sidecar-injector
+      {{- include "polaris-controller.controller.selectorLabels" . | nindent 6 }}
     spec:
       containers:
         - name: polaris-controller
-          image: polarismesh/polaris-controller:v1.3.0-beta.1
+          image: {{ template "polaris-controller.controller.image" . }}
           command: ["./polaris-controller"]
           args: ["--min-resync-period=60s",
                  "--v=4",
@@ -62,14 +61,14 @@ spec:
       restartPolicy: Always
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
-      serviceAccountName: polaris-controller
+      serviceAccountName: {{ include "polaris-controller.controller.fullname" . }}
       volumes:
         - name: certs
           secret:
             secretName: polaris-sidecar-injector
         - name: inject-config
           configMap:
-            name: polaris-sidecar-injector
+            name: {{ include "polaris-controller.controller.fullname" . }}-sidecar
             items:
               - key: mesh-config
                 path: mesh-config
@@ -79,7 +78,7 @@ spec:
                 path: values
         - name: config-volume
           configMap:
-            name: injector-mesh
+            name: {{ include "polaris-controller.controller.fullname" . }}-mesh
         - hostPath:
             path: /data/polaris-controller/log
             type: "DirectoryOrCreate"

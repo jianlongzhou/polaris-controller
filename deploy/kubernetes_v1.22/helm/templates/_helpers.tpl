@@ -3,15 +3,9 @@
 Expand the name of the chart.
 */}}
 {{- define "polaris-controller.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- default .Chart.Name .Values.controller.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "polaris-controller.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
 
 {{/*
 Create a default fully qualified app name.
@@ -32,14 +26,29 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 
 
 {{/*
-Get specific image
+Polaris controller deployment labels
 */}}
-{{- define "polaris-controller.image" -}}
-{{- if .chroot -}}
-{{- printf "%s-chroot" .image -}}
-{{- else -}}
-{{- printf "%s" .image -}}
+{{- define "polaris-controller.controller.labels" -}}
+qcloud-app: polaris-controller
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+
+{{/*
+Get specific image for controller
+*/}}
+{{- define "polaris-controller.controller.image" -}}
+{{- printf "%s:%s" .Values.controller.image.repo .Values.controller.image.tag -}}
+{{- end -}}
+
+{{/*
+Get specific image for sidecar
+*/}}
+{{- define "polaris-controller.sidecar.image" -}}
+{{- printf "%s:%s" .Values.sidecar.image.repo .Values.sidecar.image.tag -}}
 {{- end -}}
 
 
@@ -55,18 +64,9 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{/*
 Selector labels
 */}}
-{{- define "polaris-controller.selectorLabels" -}}
+{{- define "polaris-controller.controller.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "polaris-controller.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: sidecar-injector
 {{- end -}}
 
-{{/*
-Create the name of the controller service account to use
-*/}}
-{{- define "polaris-controller.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create -}}
-    {{ default (include "polaris-controller.fullname" .) .Values.serviceAccount.name }}
-{{- else -}}
-    {{ default "default" .Values.serviceAccount.name }}
-{{- end -}}
-{{- end -}}

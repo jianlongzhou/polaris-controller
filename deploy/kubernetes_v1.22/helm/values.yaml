@@ -1,38 +1,31 @@
 ## polaris controller
 ## Ref:https://github.com/polarismesh/polaris-controller/blob/main/README.md
-##
 
 ## Overrides for generated resource names
 # See templates/_helpers.tpl
 # nameOverride:
 # fullnameOverride:
 
-## Labels to apply to all resources
-##
-commonLabels: {}
-# scmhash: abc123
-# myLabel: aakkmd
-
-controller:
-  name: controller
+cluster:
+  name: default
+sidecar:
+  port: 443
   image:
-    registry: docker.io
-    image: polarismesh/polaris-controller
-    tag: "v1.3.0-beta.1"
+    repo: polarismesh/polaris-sidecar
+    tag: v1.3.0-beta.0
+    pullPolicy: Always
+polaris:
+  server:
+    address: 106.52.224.46:8090
+    token: nu/0WRA4EqSR1FagrjRj0fZwPXuGlMpX+zCuWu4uMqy8xr1vRjisSbA25aAC3mtU8MeeRsKhQiDAynUR09I=
+controller:
+  name: polaris-controller
+  webhook:
+    host: polaris.tencent.com
+  image:
+    repo: docker.io/polarismesh/polaris-controller:v1.3.0-beta.1
+    tag: v1.3.0-beta.1
     pullPolicy: IfNotPresent
-
-  # -- Configures the controller container name
-  containerName: controller
-
-  # -- Configures the ports that the nginx-controller listens on
-  containerPort:
-    http: 80
-    https: 443
-
-  # -- Process Ingress objects without ingressClass annotation/ingressClassName field
-  # Overrides value for --watch-ingress-without-class flag of the controller binary
-  # Defaults to false
-  watchIngressWithoutClass: false
-
-  # -- Process IngressClass per name (additionally as per spec.controller).
-  ingressClassByName: false
+  metrics:
+    port: 80
+    type: ClusterIP

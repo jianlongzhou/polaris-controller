@@ -1,4 +1,29 @@
-{{- define "configmap-sidecar.args" -}}
+{{/* vim: set filetype=mustache: */}}
+{{/* Note: In the controller, the go template will be used again to render the configuration,
+so some symbols {{ expr }} need to be kept from being rendered here. */}}
+
+{{/*
+Define the cmd args for the bootstrap init container.
+*/}}
+{{- define "configmap-client.config_tpl" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ "{{" }} .Namespace {{ "}}" }}
+  name: {{ "{{" }} .Name {{ "}}" }}
+data:
+  polaris.yaml: |-
+    global:
+      serverConnector:
+        addresses:
+          - {{ "{{" }} .PolarisServer {{ "}}" }}
+{{- end -}}
+
+
+{{/*
+Define the cmd args for the bootstrap init container.
+*/}}
+{{- define "configmap-sidecar.bootstrap_args" -}}
 - istio-iptables
 - -p
 - "15001"
@@ -19,7 +44,11 @@
 - --redirect-dns=true
 {{- end -}}
 
-{{- define "configmap-sidecar.envs" -}}
+
+{{/*
+Define the cmd envs for the bootstrap init container.
+*/}}
+{{- define "configmap-sidecar.bootstrap_envs" -}}
 - name: NAMESPACE
   valueFrom:
     fieldRef:
@@ -30,7 +59,11 @@
   value: {{ "{{" }}.ProxyConfig.ProxyMetadata.clusterName{{ "}}" }}
 {{- end -}}
 
-{{- define "configmap-sidecar.resources" -}}
+
+{{/*
+Define the container resources for the envoy container.
+*/}}
+{{- define "configmap-sidecar.envoy_resources" -}}
 {{ "{{" }}- if or (isset .ObjectMeta.Annotations `polarismesh.cn/proxyCPU`) (isset .ObjectMeta.Annotations `polarismesh.cn/proxyMemory`) (isset .ObjectMeta.Annotations `polarismesh.cn/proxyCPULimit`) (isset .ObjectMeta.Annotations `polarismesh.cn/proxyMemoryLimit`) {{ "}}" }}
   {{ "{{" }}- if or (isset .ObjectMeta.Annotations `polarismesh.cn/proxyCPU`) (isset .ObjectMeta.Annotations `polarismesh.cn/proxyMemory`) {{ "}}" }}
     requests:
