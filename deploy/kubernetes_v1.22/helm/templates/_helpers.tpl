@@ -35,6 +35,14 @@ Get specific image for sidecar
 
 
 {{/*
+Get specific image for sidecar init container
+*/}}
+{{- define "polaris-controller.sidecar.init.image" -}}
+{{- printf "%s:%s" .Values.sidecar.init.image.repo .Values.sidecar.init.image.tag -}}
+{{- end -}}
+
+
+{{/*
 Create a default fully qualified controller name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}

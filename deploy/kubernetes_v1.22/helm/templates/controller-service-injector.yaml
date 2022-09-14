@@ -10,4 +10,4 @@ spec:
     - port: {{ .Values.sidecar.port }}
       targetPort: 9443
   selector:
-    app: sidecar-injector
+    {{- include "polaris-controller.controller.selectorLabels" . | nindent 4 }}

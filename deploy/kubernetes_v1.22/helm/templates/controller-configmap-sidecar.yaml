@@ -34,7 +34,7 @@ data:
           runAsGroup: 1337
           runAsNonRoot: false
           runAsUser: 1337
-        imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
+        imagePullPolicy: {{ .Values.sidecar.image.pullPolicy }}
         resources:
           limits:
             cpu: 200m
@@ -51,8 +51,8 @@ data:
             name: polaris-log
       initContainers:
       - name: polaris-sidecar-init
-        image: polarismesh/polaris-sidecar-init:v1.3.0-beta.1
-        imagePullPolicy: Always
+        image: {{ include "polaris-controller.sidecar.init.image" . }}
+        imagePullPolicy: {{ .Values.sidecar.init.image.pullPolicy }}
         command: ["./start.sh"]
         resources:
           limits:
@@ -85,7 +85,7 @@ data:
           emptyDir: {}
 
   mesh-config: |-
-    {`policy: enabled
+    policy: enabled
     alwaysInjectSelector:
       []
 
@@ -111,7 +111,7 @@ data:
         - mountPath: /etc/envoy_logs
           name: envoy-logs
           readOnly: false
-      - image: polarismesh/polaris-sidecar:v1.3.0-beta.0
+      - image: {{ include "polaris-controller.sidecar.image" . }}
         name: polaris-sidecar
         securityContext:
           runAsUser: 1337
@@ -177,4 +177,4 @@ data:
         - name: polaris-dir
           emptyDir: {}
         - name: polaris-log
-          emptyDir: {}`}
+          emptyDir: {}

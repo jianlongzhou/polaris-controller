@@ -14,16 +14,21 @@ sidecar:
     repo: polarismesh/polaris-sidecar
     tag: v1.3.0-beta.0
     pullPolicy: Always
+  init:
+    image:
+      repo: polarismesh/polaris-sidecar
+      tag: v1.3.0-beta.0
+      pullPolicy: Always
 polaris:
   server:
-    address: 106.52.224.46:8090
+    address: 106.52.224.46
     token: nu/0WRA4EqSR1FagrjRj0fZwPXuGlMpX+zCuWu4uMqy8xr1vRjisSbA25aAC3mtU8MeeRsKhQiDAynUR09I=
 controller:
   name: polaris-controller
   webhook:
     host: polaris.tencent.com
   image:
-    repo: docker.io/polarismesh/polaris-controller:v1.3.0-beta.1
+    repo: polarismesh/polaris-controller
     tag: v1.3.0-beta.1
     pullPolicy: IfNotPresent
   metrics:

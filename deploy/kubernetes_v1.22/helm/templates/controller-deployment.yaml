@@ -20,7 +20,7 @@ spec:
   template:
     metadata:
       labels:
-      {{- include "polaris-controller.controller.selectorLabels" . | nindent 6 }}
+      {{- include "polaris-controller.controller.selectorLabels" . | nindent 8 }}
     spec:
       containers:
         - name: polaris-controller
@@ -42,7 +42,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          imagePullPolicy: Always
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
           volumeMounts:
             - mountPath: /polaris-controller/log
               name: log
@@ -65,7 +65,7 @@ spec:
       volumes:
         - name: certs
           secret:
-            secretName: polaris-sidecar-injector
+            secretName: {{ include "polaris-controller.controller.fullname" . }}
         - name: inject-config
           configMap:
             name: {{ include "polaris-controller.controller.fullname" . }}-sidecar
