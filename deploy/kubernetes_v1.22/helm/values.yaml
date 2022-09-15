@@ -6,10 +6,14 @@
 # nameOverride:
 # fullnameOverride:
 
+## cluster name register in polaris server
 cluster:
   name: default
+
+## sidecar config for controller injector
 sidecar:
   port: 443
+  mode: mesh
   image:
     repo: polarismesh/polaris-sidecar
     tag: v1.3.0-beta.0
@@ -19,10 +23,14 @@ sidecar:
       repo: polarismesh/polaris-sidecar
       tag: v1.3.0-beta.0
       pullPolicy: Always
+
+## polaris server config
 polaris:
   server:
     address: 106.52.224.46
     token: nu/0WRA4EqSR1FagrjRj0fZwPXuGlMpX+zCuWu4uMqy8xr1vRjisSbA25aAC3mtU8MeeRsKhQiDAynUR09I=
+
+## polaris controller config
 controller:
   name: polaris-controller
   webhook:
